@@ -8,3 +8,37 @@ Take a look around and use the https://github.com/jxblum/spring-gemfire-tests/is
 or https://github.com/jxblum/spring-gemfire-tests/pulls[PR] feature to provide feedback.
 
 Thanks!
+
+
+
+
+https://stackoverflow.com/questions/44529029/spring-cache-with-collection-of-items-entities/44557156#44557156
+https://stackoverflow.com/questions/51237672/spring-cache-all-elements-in-list-separately
+
+
+
+In fact, it is possible, even with Spring's Caching Abstraction, but not out-of-the-box (OOTB). Essentially, you must customize Spring's caching infrastructure (Explained further below)
+
+By default, Spring's caching infrastructure uses the entire @Cacheable method parameter arguments as the cache "key", as explained here. Of course you can also customize the key resolution using either a SpEL Expression or with a custom KeyGenerator implementation, as explained here.
+
+Still, that does not break up the collection or array of parameter arguments along with the @Cacheable method's return value into individual cache entries (i.e. key/value pairs based on the array/collection or Map).
+
+For that, you need a custom implementation of Spring's CacheManager (dependent on your caching strategy/provider) and Cache interfaces.
+
+NOTE: Ironically, this will be the 3rd time I have answered nearly the same question, first here, then here and now here, :-). Anyway...
+
+I have updated/cleaned up my example (a bit) for this posting.
+
+Notice that my example extends and customizes the ConcurrentMapCacheManager provided in the Spring Framework itself.
+
+Theoretically, you could extend/customize any CacheManager implementation, like Redis's in Spring Data Redis, here (source), or Pivotal GemFire's CacheManager in Spring Data GemFire, here (source). The open source version of Pivotal GemFire is Apache Geode, which has a corresponding Spring Data Geode project, (source for CacheManager in Spring Data Geode, which is basically identical to SD GemFire). Of course, you can apply this technique to other caching providers... Hazelcast, Ehcache, etc.
+
+However, the real guts of the work is handled by the custom implementation (or mores specifically, the base class) of Spring's Cache interface.
+
+Anyway, hopefully from my example, you will be able to figure out what you need to do in your application to satisfy your application's caching requirements.
+
+Additionally, you can apply the same approach to handling Maps, but I will leave that as an exercise for you, ;-).
+
+Hope this helps!
+
+Cheers, John
